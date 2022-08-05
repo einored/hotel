@@ -50,6 +50,7 @@
                         @endif
                         @else
 
+                        @if(Auth::user()->role > 9)
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 Countries
@@ -65,6 +66,7 @@
 
                             </div>
                         </li>
+                        @endif
 
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -74,11 +76,11 @@
                                 <a class="dropdown-item" href="{{ route('hotels-index') }}">
                                     Hotel List
                                 </a>
-
+                                @if(Auth::user()->role > 9)
                                 <a class="dropdown-item" href="{{ route('hotels-create') }}">
                                     Add hotel
                                 </a>
-
+                                @endif
                             </div>
                         </li>
 
@@ -90,7 +92,9 @@
                                 <a class="dropdown-item" href="{{ route('orders-index') }}">
                                     Order List
                                 </a>
-
+                                <a class="dropdown-item" href="{{ route('orders-create') }}">
+                                    Add order
+                                </a>
                             </div>
                         </li>
 

@@ -19,8 +19,10 @@
                                 <th scope="col">Price</th>
                                 <th scope="col">Image</th>
                                 <th scope="col">Trip time</th>
+                                @if(Auth::user()->role > 9)
                                 <th scope="col">Edit</th>
                                 <th scope="col">Delete</th>
+                                @endif
                             </tr>
                         </thead>
                         @forelse($hotels as $hotel)
@@ -31,6 +33,7 @@
                             <td>{{$hotel->price}}</td>
                             <td>{{$hotel->image}}</td>
                             <td>{{$hotel->trip_time}}</td>
+                            @if(Auth::user()->role > 9)
                             <td>
                                 <a class="btn btn-success btn-sm" href="{{route('hotels-edit', $hotel)}}">Edit</a>
                             </td>
@@ -41,6 +44,7 @@
                                     <button type="submit" class="btn btn-outline-warning btn-sm">Delete</button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
 
                         @empty

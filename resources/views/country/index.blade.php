@@ -7,7 +7,7 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">Country list</div>
-
+@if(Auth::user()->role > 9)
                 <div class="card-body">
                     @include('msg.main')
                     <table class="table">
@@ -42,6 +42,7 @@
                         @endforelse
                     </table>
                 </div>
+@endif
             </div>
         </div>
     </div>

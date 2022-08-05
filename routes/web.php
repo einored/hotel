@@ -25,39 +25,39 @@ Auth::routes();
 
 //Country routes
 //index
-Route::get('/countries', [Country::class, 'index'])->name('countries-index');
+Route::get('/countries', [Country::class, 'index'])->name('countries-index')->middleware('rp:admin') ;
 //create
-Route::get('/countries/create', [Country::class, 'create'])->name('countries-create');
-Route::post('/countries', [Country::class, 'store'])->name('countries-store');
+Route::get('/countries/create', [Country::class, 'create'])->name('countries-create')->middleware('rp:admin');
+Route::post('/countries', [Country::class, 'store'])->name('countries-store')->middleware('rp:admin');
 //edit
-Route::get('/countries/edit/{country}', [Country::class, 'edit'])->name('countries-edit');
-Route::put('/countries/edit/{country}', [Country::class, 'update'])->name('countries-update');
+Route::get('/countries/edit/{country}', [Country::class, 'edit'])->name('countries-edit')->middleware('rp:admin');
+Route::put('/countries/edit/{country}', [Country::class, 'update'])->name('countries-update')->middleware('rp:admin');
 //delete
-Route::delete('/countries/{country}', [Country::class, 'destroy'])->name('countries-delete');
+Route::delete('/countries/{country}', [Country::class, 'destroy'])->name('countries-delete')->middleware('rp:admin');
 
 //Hotel routes
 //index
-Route::get('/hotels', [Hotel::class, 'index'])->name('hotels-index');
+Route::get('/hotels', [Hotel::class, 'index'])->name('hotels-index')->middleware('rp:user');
 //create
-Route::get('/hotels/create', [Hotel::class, 'create'])->name('hotels-create');
-Route::post('/hotels', [Hotel::class, 'store'])->name('hotels-store');
+Route::get('/hotels/create', [Hotel::class, 'create'])->name('hotels-create')->middleware('rp:admin');
+Route::post('/hotels', [Hotel::class, 'store'])->name('hotels-store')->middleware('rp:admin');
 //edit
-Route::get('/hotels/edit/{hotel}', [Hotel::class, 'edit'])->name('hotels-edit');
-Route::put('/hotels/edit/{hotel}', [Hotel::class, 'update'])->name('hotels-update');
+Route::get('/hotels/edit/{hotel}', [Hotel::class, 'edit'])->name('hotels-edit')->middleware('rp:admin');
+Route::put('/hotels/edit/{hotel}', [Hotel::class, 'update'])->name('hotels-update')->middleware('rp:admin');
 //delete
-Route::delete('/hotels/{hotel}', [Hotel::class, 'destroy'])->name('hotels-delete');
+Route::delete('/hotels/{hotel}', [Hotel::class, 'destroy'])->name('hotels-delete')->middleware('rp:admin');
 
 //Order routes
 //index
-Route::get('/orders', [Order::class, 'index'])->name('orders-index');
+Route::get('/orders', [Order::class, 'index'])->name('orders-index')->middleware('rp:user');
 //create
-Route::get('/orders/create', [Order::class, 'create'])->name('orders-create');
-Route::post('/orders', [Order::class, 'store'])->name('orders-store');
+Route::get('/orders/create', [Order::class, 'create'])->name('orders-create')->middleware('rp:user');
+Route::post('/orders', [Order::class, 'store'])->name('orders-store')->middleware('rp:user');
 //edit
-Route::get('/orders/edit/{order}', [Order::class, 'edit'])->name('orders-edit');
-Route::put('/orders/edit/{order}', [Order::class, 'update'])->name('orders-update');
+Route::get('/orders/edit/{order}', [Order::class, 'edit'])->name('orders-edit')->middleware('rp:user');
+Route::put('/orders/edit/{order}', [Order::class, 'update'])->name('orders-update')->middleware('rp:user');
 //delete
-Route::delete('/orders/{order}', [Order::class, 'destroy'])->name('orders-delete');
+Route::delete('/orders/{order}', [Order::class, 'destroy'])->name('orders-delete')->middleware('rp:user');
 
 
 

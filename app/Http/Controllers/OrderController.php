@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -45,10 +46,10 @@ class OrderController extends Controller
     {
         $order = new Order;
 
-        $order->hotel_id = $request->create_hotel_country_id;
+        $order->hotel_id = $request->create_order_hotel_id;
         $order->user_id = Auth::user()->id;
 
-        $hotel->save();
+        $order->save();
 
         return redirect()->route('orders-index')->with('success', 'Created new order!');
     }
