@@ -7,7 +7,7 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">Order list</div>
-
+                @if(Auth::user()->role > 9)
                 <div class="card-body">
                     @include('msg.main')
                     <table class="table">
@@ -44,8 +44,33 @@
                         @endforelse
                     </table>
                 </div>
+                @endif
+                @if(Auth::user()->role < 9) <div class="card-body">
+                    @include('msg.main')
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Hotel</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        @forelse($orders as $order)
+                        @if(Auth::user()->id == $order->user_id)
+                        <tr>
+                            <td>{{$order->hotel->hotel_name}}</td>
+                            <td>{{$order->status}}</td>
+                        </tr>
+
+
+                        @endif
+                        @empty
+                        <li>No Orders...</li>
+                        @endforelse
+                    </table>
             </div>
+            @endif
         </div>
     </div>
+</div>
 </div>
 @endsection
