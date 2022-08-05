@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Country;
 use App\Http\Requests\StoreCountryRequest;
 use App\Http\Requests\UpdateCountryRequest;
+use Illuminate\Http\Request;
 
 class CountryController extends Controller
 {
@@ -13,9 +14,11 @@ class CountryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $countries = Country::all();
+
+        return view('country.index', ['countries' => $countries]);
     }
 
     /**
@@ -25,7 +28,7 @@ class CountryController extends Controller
      */
     public function create()
     {
-        //
+        return view('country.create');
     }
 
     /**
@@ -34,9 +37,16 @@ class CountryController extends Controller
      * @param  \App\Http\Requests\StoreCountryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCountryRequest $request)
+    public function store(Request $request)
     {
-        //
+        $country = new Country;
+
+        $country->country_name = $request->create_country_name;
+        $country->season_time = $request->create_country_season_time;
+
+        $country->save();
+
+        return redirect()->route('countries-index')->with('success', 'Created new country!');
     }
 
     /**
@@ -58,7 +68,9 @@ class CountryController extends Controller
      */
     public function edit(Country $country)
     {
-        //
+        // $countries = Country::all();
+
+        return view('country.edit', ['country' => $country]);
     }
 
     /**
@@ -68,9 +80,14 @@ class CountryController extends Controller
      * @param  \App\Models\Country  $country
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCountryRequest $request, Country $country)
+    public function update(Request $request, Country $country)
     {
-        //
+        $country->country_name = $request->country_name;
+        $country->season_time = $request->country_season_time;
+
+        $country->save();
+
+        return redirect()->route('countries-index')->with('success', 'Country updated!');
     }
 
     /**
@@ -81,6 +98,8 @@ class CountryController extends Controller
      */
     public function destroy(Country $country)
     {
-        //
+        $country->delete();
+
+        return redirect()->route('countries-index')->with('delete', 'Country deleted!');
     }
 }

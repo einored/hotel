@@ -6,3 +6,21 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+.alert-success {
+    background-color: aquamarine;
+    padding: 10px;
+    display: flex;
+}
+
+.alert-delete {
+    background-color: skyblue;
+    padding: 10px;
+    display: flex;
+}
+
+.alert-error {
+    background-color: red;
+    padding: 10px;
+    display: flex;
+}

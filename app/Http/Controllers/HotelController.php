@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Hotel;
+use App\Models\Country;
 use App\Http\Requests\StoreHotelRequest;
 use App\Http\Requests\UpdateHotelRequest;
+use Illuminate\Http\Request;
 
 class HotelController extends Controller
 {
@@ -13,9 +15,11 @@ class HotelController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $hotels = Hotel::all();
+
+        return view('hotel.index', ['hotels' => $hotels]);
     }
 
     /**
@@ -25,7 +29,9 @@ class HotelController extends Controller
      */
     public function create()
     {
-        //
+        $countries = Country::all();
+
+        return view('hotel.create', ['countries' => $countries]);
     }
 
     /**
@@ -34,9 +40,19 @@ class HotelController extends Controller
      * @param  \App\Http\Requests\StoreHotelRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreHotelRequest $request)
+    public function store(Request $request)
     {
-        //
+        $hotel = new Hotel;
+
+        $hotel->country_id = $request->create_hotel_country_id;
+        $hotel->hotel_name = $request->create_hotel_name;
+        $hotel->price = $request->create_hotel_price;
+        $hotel->image = $request->create_hotel_image;
+        $hotel->trip_time = $request->create_hotel_trip_time;
+
+        $hotel->save();
+
+        return redirect()->route('hotels-index')->with('success', 'Created new hotel!');
     }
 
     /**
@@ -58,7 +74,9 @@ class HotelController extends Controller
      */
     public function edit(Hotel $hotel)
     {
-        //
+        $countries = Country::all();
+
+        return view('hotel.edit', ['hotel' => $hotel, 'countries' => $countries]);
     }
 
     /**
@@ -68,9 +86,17 @@ class HotelController extends Controller
      * @param  \App\Models\Hotel  $hotel
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateHotelRequest $request, Hotel $hotel)
-    {
-        //
+    public function update(Request $request, Hotel $hotel)
+    {        
+        $hotel->country_id = $request->hotel_country_id;
+        $hotel->hotel_name = $request->hotel_name;
+        $hotel->price = $request->hotel_price;
+        $hotel->image = $request->hotel_image;
+        $hotel->trip_time = $request->hotel_trip_time;
+
+        $hotel->save();
+
+        return redirect()->route('hotels-index')->with('success', 'Hotel updated!');
     }
 
     /**
@@ -81,6 +107,8 @@ class HotelController extends Controller
      */
     public function destroy(Hotel $hotel)
     {
-        //
+        $hotel->delete();
+
+        return redirect()->route('hotels-index')->with('delete', 'Hotel deleted!');
     }
 }
