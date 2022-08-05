@@ -5,6 +5,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col">
+            {{-- @include('parts.box') --}}
             <div class="card">
                 <div class="card-header">Hotel list</div>
 
