@@ -7,6 +7,7 @@ use App\Models\Country;
 use App\Http\Requests\StoreHotelRequest;
 use App\Http\Requests\UpdateHotelRequest;
 use Illuminate\Http\Request;
+use DB;
 
 class HotelController extends Controller
 {
@@ -17,9 +18,78 @@ class HotelController extends Controller
      */
     public function index(Request $request)
     {
-        $hotels = Hotel::all();
+        if ($request->s) {
+            list($w1, $w2) = explode(' ', $request->s . ' ');
 
-        return view('hotel.index', ['hotels' => $hotels]);
+            $hotelsDir = [DB::table('hotels')
+                ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
+                ->where('countries.country_name', 'like', '%'.$w1.'%')
+                ->where('hotels.hotel_name', 'like', '%'.$w2.'%')
+                ->orWhere(fn($query) => $query
+                ->where('countries.country_name', 'like', '%'.$w2.'%')
+                ->where('hotels.hotel_name', 'like', '%'.$w1.'%'))
+                ->orWhere(fn($query) => $query
+                ->where('hotels.hotel_name', 'like', '%'.$w2.'%')
+                ->where('hotels.hotel_name', 'like', '%'.$w1.'%'))
+                ->orderBy('hotels.hotel_name', 'asc')
+                ->get(), 'default'];
+            $filter = 0;
+        }
+        else {
+            if (!$request->country_id) {
+
+                $hotelsDir = match($request->sort) {
+                    'price-asc' => [DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
+                                    ->orderBy('hotels.price', 'asc')
+                                    ->get(), 'price-asc'],
+                    'price-desc' => [DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
+                                    ->orderBy('hotels.price', 'desc')
+                                    ->get(), 'price-desc'],            
+                    default => [DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
+                                    ->orderBy('hotels.id', 'desc')
+                                    ->get(), 'default']
+                };
+                $filter = 0;
+            }
+            else {
+                $hotelsDir = match($request->sort) {
+                    'price-asc' => [DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
+                                    ->where('countries.id', $request->country_id)
+                                    ->orderBy('hotels.price', 'asc')
+                                    ->get(), 'price-asc'],
+                    'price-desc' => [DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
+                                    ->where('countries.id', $request->country_id)
+                                    ->orderBy('hotels.price', 'desc')
+                                    ->get(), 'price-desc'],            
+                    default => [DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
+                                    ->orderBy('hotels.id', 'desc')
+                                    ->get(), 'default']
+                };
+                $filter = (int) $request->country_id;
+            }
+        }
+        
+
+        return view('hotel.index', [
+            'hotels' => $hotelsDir[0],
+            'sort' => $hotelsDir[1],
+            'countries' => Country::all(),
+            'filter' => $filter,
+            's' => $request->s ?? ''
+        ]);
     }
 
     /**

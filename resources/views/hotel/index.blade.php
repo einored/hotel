@@ -5,7 +5,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col">
-            {{-- @include('parts.box') --}}
+            @include('parts.box')
             <div class="card">
                 <div class="card-header">Hotel list</div>
 
@@ -29,7 +29,8 @@
                         @forelse($hotels as $hotel)
                         <tr>
                             <td>{{$hotel->id}}</td>
-                            <td>{{$hotel->country->country_name}}</td>
+                            {{-- <td>{{$hotel->country->country_name}}</td> --}}
+                            <td>{{$hotel->country_name}}</td>
                             <td>{{$hotel->hotel_name}}</td>
                             <td>{{$hotel->price}}</td>
                             <td>{{$hotel->image}}</td>

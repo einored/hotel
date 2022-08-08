@@ -22,15 +22,14 @@
                             <select class="form-control" name="country_id">
                                 <option value="0" @if($filter==0) selected @endif>No Filter, please</option>
                                 @foreach($countries as $country)
-                                <option value="{{$country->id}}" @if($filter==$country->id) selected @endif>{{$country->name}}</option>
+                                <option value="{{$country->id}}" @if($filter==$country->id) selected @endif>{{$country->country_name}}</option>
                                 @endforeach
                             </select>
                         </div>
-
                     </div>
                     <div class="col-5">
                         <button type="submit" class="btn btn-outline-warning m-2 mt-4">Sort!</button>
-                        <a class="btn btn-outline-success m-2 mt-4" href="{{route('front-index')}}">Clear!</a>
+                        <a class="btn btn-outline-success m-2 mt-4" href="{{route('hotels-index')}}">Clear!</a>
                     </div>
 
                 </div>
