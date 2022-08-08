@@ -33,14 +33,19 @@
                             <td>{{$hotel->country_name}}</td>
                             <td>{{$hotel->hotel_name}}</td>
                             <td>{{$hotel->price}}</td>
-                            <td>{{$hotel->image}}</td>
+                            {{-- <td>{{$hotel->image}}</td> --}}
+                            <td class="image-box">
+                                @if($hotel->image)
+                                <img  src="{{$hotel->image}}">
+                                @endif
+                            </td>
                             <td>{{$hotel->trip_time}}</td>
                             @if(Auth::user()->role > 9)
                             <td>
-                                <a class="btn btn-success btn-sm" href="{{route('hotels-edit', $hotel)}}">Edit</a>
+                                <a class="btn btn-success btn-sm" href="{{route('hotels-edit', $hotel->id)}}">Edit</a>
                             </td>
                             <td>
-                                <form class="delete" action="{{route('hotels-delete', $hotel)}}" method="post">
+                                <form class="delete" action="{{route('hotels-delete', $hotel->id)}}" method="post">
                                     @csrf
                                     @method('delete')
                                     <button type="submit" class="btn btn-outline-warning btn-sm">Delete</button>

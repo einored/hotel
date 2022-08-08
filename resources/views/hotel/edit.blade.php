@@ -11,7 +11,7 @@
                 <div class="card-body">
                     @include('msg.main')
                     <ul>
-                        <form action="{{route('hotels-edit', $hotel)}}" method="post">
+                        <form action="{{route('hotels-edit', $hotel)}}" method="post" enctype="multipart/form-data">
                             <li>Country</li>
                             <select class="form-control" name="hotel_country_id" required focus>
                                 @foreach($countries as $country)
@@ -23,7 +23,13 @@
                             <li>Price</li>
                             <input type="text" class="form-control" name="hotel_price" value="{{old('hotel_price', $hotel->price)}}" />
                             <li>Image</li>
-                            <input type="text" class="form-control" name="hotel_image" value="{{old('hotel_image', $hotel->image)}}" />
+                            @if($hotel->image)
+                            <div class="image-box">
+                                <img src="{{$hotel->image}}">
+                            </div>
+                            @endif
+                            <input class="form-control" type="file" name="hotel_image" />
+                            {{-- <input type="text" class="form-control" name="hotel_image" value="{{old('hotel_image', $hotel->image)}}" /> --}}
                             <li>Trip time</li>
                             <input type="number" class="form-control" name="hotel_trip_time" value="{{old('hotel_trip_time', $hotel->trip_time)}}" />
                             @csrf

@@ -179,7 +179,26 @@ class HotelController extends Controller
         $hotel->country_id = $request->create_hotel_country_id;
         $hotel->hotel_name = $request->create_hotel_name;
         $hotel->price = $request->create_hotel_price;
-        $hotel->image = $request->create_hotel_image;
+        // $hotel->image = $request->create_hotel_image;
+        if ($request->file('create_hotel_image')) {
+
+            $image = $request->file('create_hotel_image');
+
+            $ext = $image->getClientOriginalExtension();
+
+            $name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+
+            $file = $name. '-' . rand(100000, 999999). '.' . $ext;
+
+            $Image = Image::make($image)->pixelate(12);
+
+            $Image->save(public_path().'/images/'.$file);
+
+            $image->move(public_path().'/images', $file);
+
+            $hotel->image = asset('/images') . '/' . $file;
+
+        }
         $hotel->trip_time = $request->create_hotel_trip_time;
 
         $hotel->save();
@@ -204,9 +223,10 @@ class HotelController extends Controller
      * @param  \App\Models\Hotel  $hotel
      * @return \Illuminate\Http\Response
      */
-    public function edit(Hotel $hotel)
+    public function edit(int $hotel_Id)
     {
         $countries = Country::all();
+        $hotel = Hotel::where('id', $hotel_Id)->first();
 
         return view('hotel.edit', ['hotel' => $hotel, 'countries' => $countries]);
     }
@@ -223,7 +243,31 @@ class HotelController extends Controller
         $hotel->country_id = $request->hotel_country_id;
         $hotel->hotel_name = $request->hotel_name;
         $hotel->price = $request->hotel_price;
-        $hotel->image = $request->hotel_image;
+        // $hotel->image = $request->hotel_image;
+        if ($request->file('hotel_image')) {
+
+            $name = pathinfo($hotel->image, PATHINFO_FILENAME);
+            $ext = pathinfo($hotel->image, PATHINFO_EXTENSION);
+    
+            // $path = asset('/images') . '/' . $name . '.' . $ext;
+            $path = '\xampp\htdocs\hotel\public/images' . '/' . $name . '.' . $ext;
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            $image = $request->file('hotel_image');
+
+            $ext = $image->getClientOriginalExtension();
+
+            $name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+
+            $file = $name. '-' . rand(100000, 999999). '.' . $ext;
+
+            $image->move(public_path().'/images', $file);
+
+            $hotel->image = asset('/images') . '/' . $file;
+
+        }
         $hotel->trip_time = $request->hotel_trip_time;
 
         $hotel->save();
@@ -237,10 +281,38 @@ class HotelController extends Controller
      * @param  \App\Models\Hotel  $hotel
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Hotel $hotel)
+    public function destroy(int $hotel_Id)
     {
+        $hotel = Hotel::where('id', $hotel_Id)->first();
+
+        if ($hotel->image) {
+            $name = pathinfo($hotel->image, PATHINFO_FILENAME);
+            $ext = pathinfo($hotel->image, PATHINFO_EXTENSION);
+            // $path = asset('/images') . '/' . $name . '.' . $ext;
+            $path = '\xampp\htdocs\hotel\public/images' . '/' . $name . '.' . $ext;
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
         $hotel->delete();
 
         return redirect()->route('hotels-index')->with('delete', 'Hotel deleted!');
+    }
+
+    public function deletePicture(Hotel $hotel) 
+    {
+        $name = pathinfo($hotel->image, PATHINFO_FILENAME);
+        $ext = pathinfo($hotel->image, PATHINFO_EXTENSION);
+
+        $path = asset('/images') . '/' . $name . '.' . $ext;
+
+        if(file_exists($path)) {
+            unlink($path);
+        }
+        
+        $hotel->image = null;
+        $hotel->save();
+
+        return redirect()->back()->with('deleted', 'Hotel have no photo now');
     }
 }
