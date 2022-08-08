@@ -11,6 +11,8 @@ use DB;
 
 class HotelController extends Controller
 {
+    private $perPage = 10;
+    
     /**
      * Display a listing of the resource.
      *
@@ -21,6 +23,21 @@ class HotelController extends Controller
         if ($request->s) {
             list($w1, $w2) = explode(' ', $request->s . ' ');
 
+            $allCount = DB::table('hotels')
+            ->join('countries', 'countries.id', '=', 'hotels.country_id')
+            ->select(DB::raw('count(hotels.id) AS allHotels'))
+            ->where('countries.country_name', 'like', '%'.$w1.'%')
+            ->where('hotels.hotel_name', 'like', '%'.$w2.'%')
+            ->orWhere(fn($query) => $query
+            ->where('countries.country_name', 'like', '%'.$w2.'%')
+            ->where('hotels.hotel_name', 'like', '%'.$w1.'%'))
+            ->orWhere(fn($query) => $query
+            ->where('hotels.hotel_name', 'like', '%'.$w2.'%')
+            ->where('hotels.hotel_name', 'like', '%'.$w1.'%'))
+            ->first()->allHotels;
+                  
+            $page = $request->page ?? 1;
+ 
             $hotelsDir = [DB::table('hotels')
                 ->join('countries', 'countries.id', '=', 'hotels.country_id')
                 ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
@@ -33,62 +50,107 @@ class HotelController extends Controller
                 ->where('hotels.hotel_name', 'like', '%'.$w2.'%')
                 ->where('hotels.hotel_name', 'like', '%'.$w1.'%'))
                 ->orderBy('hotels.hotel_name', 'asc')
+                ->offset(($page - 1) * $this->perPage)
+                ->limit($this->perPage)
                 ->get(), 'default'];
             $filter = 0;
         }
         else {
             if (!$request->country_id) {
 
+                $allCount = DB::table('hotels')
+                ->select(DB::raw('count(hotels.id) AS allHotels, count(DISTINCT(hotels.hotel_name)) AS allNames'))
+                ->first()->allHotels;
+                $page = $request->page ?? 1;
+
                 $hotelsDir = match($request->sort) {
                     'price-asc' => [DB::table('hotels')
                                     ->join('countries', 'countries.id', '=', 'hotels.country_id')
                                     ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
                                     ->orderBy('hotels.price', 'asc')
+                                    ->offset(($page - 1) * $this->perPage)
+                                    ->limit($this->perPage)
                                     ->get(), 'price-asc'],
                     'price-desc' => [DB::table('hotels')
                                     ->join('countries', 'countries.id', '=', 'hotels.country_id')
                                     ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
                                     ->orderBy('hotels.price', 'desc')
+                                    ->offset(($page - 1) * $this->perPage)
+                                    ->limit($this->perPage)
                                     ->get(), 'price-desc'],            
                     default => [DB::table('hotels')
                                     ->join('countries', 'countries.id', '=', 'hotels.country_id')
                                     ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
                                     ->orderBy('hotels.id', 'desc')
+                                    ->offset(($page - 1) * $this->perPage)
+                                    ->limit($this->perPage)
                                     ->get(), 'default']
                 };
                 $filter = 0;
             }
             else {
+                $allCount = match($request->sort) {
+                    'price-asc' => DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select(DB::raw('count(hotels.id) AS allHotels'))
+                                    ->where('hotels.country_id', $request->country_id)
+                                    ->first()->allHotels,
+                    'price-desc' => DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select(DB::raw('count(hotels.id) AS allHotels'))
+                                    ->where('hotels.country_id', $request->country_id)
+                                    ->first()->allHotels,                    
+                    default => DB::table('hotels')
+                                    ->join('countries', 'countries.id', '=', 'hotels.country_id')
+                                    ->select(DB::raw('count(hotels.id) AS allHotels'))
+                                    ->where('hotels.country_id', $request->country_id)
+                                    ->first()->allHotels,
+                };
+
+                $page = $request->page ?? 1;
+
                 $hotelsDir = match($request->sort) {
                     'price-asc' => [DB::table('hotels')
                                     ->join('countries', 'countries.id', '=', 'hotels.country_id')
                                     ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
                                     ->where('countries.id', $request->country_id)
                                     ->orderBy('hotels.price', 'asc')
+                                    ->offset(($page - 1) * $this->perPage)
+                                    ->limit($this->perPage)
                                     ->get(), 'price-asc'],
                     'price-desc' => [DB::table('hotels')
                                     ->join('countries', 'countries.id', '=', 'hotels.country_id')
                                     ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
                                     ->where('countries.id', $request->country_id)
                                     ->orderBy('hotels.price', 'desc')
+                                    ->offset(($page - 1) * $this->perPage)
+                                    ->limit($this->perPage)
                                     ->get(), 'price-desc'],            
                     default => [DB::table('hotels')
                                     ->join('countries', 'countries.id', '=', 'hotels.country_id')
                                     ->select('countries.*', 'hotels.id', 'hotels.country_id', 'hotels.hotel_name', 'hotels.price' , 'hotels.image', 'hotels.trip_time')
                                     ->orderBy('hotels.id', 'desc')
+                                    ->offset(($page - 1) * $this->perPage)
+                                    ->limit($this->perPage)
                                     ->get(), 'default']
                 };
                 $filter = (int) $request->country_id;
             }
         }
-        
+
+        $parsedUrl = parse_url(url()->full());
+        parse_str($parsedUrl['query'] ?? '', $prevQuery);        
 
         return view('hotel.index', [
             'hotels' => $hotelsDir[0],
             'sort' => $hotelsDir[1],
             'countries' => Country::all(),
             'filter' => $filter,
-            's' => $request->s ?? ''
+            's' => $request->s ?? '',
+            'allCount' => $allCount ?? 0,
+            'perPage' => $this->perPage ?? 0,
+            'prevQuery' => $prevQuery,
+            'pageNow' => $page ?? 0
         ]);
     }
 

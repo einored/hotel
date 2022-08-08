@@ -54,6 +54,7 @@
                         @endforelse
                     </table>
                 </div>
+                @include('parts.pager')
             </div>
         </div>
     </div>
