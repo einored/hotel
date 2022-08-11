@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Hotel;
 use App\Models\Country;
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreHotelRequest;
 use App\Http\Requests\UpdateHotelRequest;
 use Illuminate\Http\Request;
@@ -179,31 +181,35 @@ class HotelController extends Controller
         $hotel->country_id = $request->create_hotel_country_id;
         $hotel->hotel_name = $request->create_hotel_name;
         $hotel->price = $request->create_hotel_price;
-        // $hotel->image = $request->create_hotel_image;
+        // $hotel->image = $request->create_hotel_image; 
+
         if ($request->file('create_hotel_image')) {
-
             $image = $request->file('create_hotel_image');
-
             $ext = $image->getClientOriginalExtension();
-
             $name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-
             $file = $name. '-' . rand(100000, 999999). '.' . $ext;
-
-            $Image = Image::make($image)->pixelate(12);
-
-            $Image->save(public_path().'/images/'.$file);
-
             $image->move(public_path().'/images', $file);
-
             $hotel->image = asset('/images') . '/' . $file;
-
         }
+
         $hotel->trip_time = $request->create_hotel_trip_time;
 
         $hotel->save();
 
         return redirect()->route('hotels-index')->with('success', 'Created new hotel!');
+    }
+
+    public function order(int $hotel_Id)
+    {
+        $hotel = Hotel::where('id', $hotel_Id)->first();
+
+        $order = new Order;
+        $order->hotel_id = $hotel->id;
+        $order->user_id = Auth::user()->id;
+
+        $order->save();
+
+        return redirect()->route('orders-index')->with('success', 'Order added!');
     }
 
     /**
@@ -254,19 +260,12 @@ class HotelController extends Controller
             if (file_exists($path)) {
                 unlink($path);
             }
-
             $image = $request->file('hotel_image');
-
             $ext = $image->getClientOriginalExtension();
-
             $name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-
             $file = $name. '-' . rand(100000, 999999). '.' . $ext;
-
             $image->move(public_path().'/images', $file);
-
             $hotel->image = asset('/images') . '/' . $file;
-
         }
         $hotel->trip_time = $request->hotel_trip_time;
 
@@ -283,6 +282,16 @@ class HotelController extends Controller
      */
     public function destroy(int $hotel_Id)
     {
+        $allOrders = DB::table('orders')
+                    ->join('hotels', 'hotels.id', '=', 'orders.hotel_id')
+                    ->select(DB::raw('count(orders.id) AS allOrders'))
+                    ->where('orders.hotel_id', $hotel_Id)
+                    ->first()->allOrders;
+
+        if ($allOrders > 0) {
+            return redirect()->route('hotels-index')->with('error', 'Hotel has orders!');
+        }
+
         $hotel = Hotel::where('id', $hotel_Id)->first();
 
         if ($hotel->image) {
@@ -294,6 +303,8 @@ class HotelController extends Controller
                 unlink($path);
             }
         }
+        
+
         $hotel->delete();
 
         return redirect()->route('hotels-index')->with('delete', 'Hotel deleted!');

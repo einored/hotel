@@ -44,6 +44,8 @@ Route::post('/hotels', [Hotel::class, 'store'])->name('hotels-store')->middlewar
 //edit
 Route::get('/hotels/edit/{hotel}', [Hotel::class, 'edit'])->name('hotels-edit')->middleware('rp:admin');
 Route::put('/hotels/edit/{hotel}', [Hotel::class, 'update'])->name('hotels-update')->middleware('rp:admin');
+//order
+Route::put('/hotels/{hotel}', [Hotel::class, 'order'])->name('hotels-order')->middleware('rp:user');
 //delete
 Route::delete('/hotels/{hotel}', [Hotel::class, 'destroy'])->name('hotels-delete')->middleware('rp:admin');
 
@@ -58,7 +60,8 @@ Route::get('/orders/edit/{order}', [Order::class, 'edit'])->name('orders-edit')-
 Route::put('/orders/edit/{order}', [Order::class, 'update'])->name('orders-update')->middleware('rp:user');
 //delete
 Route::delete('/orders/{order}', [Order::class, 'destroy'])->name('orders-delete')->middleware('rp:user');
-
+// //order
+// Route::put('/hotels/{hotel}', [Order::class, 'order'])->name('orders-add')->middleware('rp:user');
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

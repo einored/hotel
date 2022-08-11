@@ -12,7 +12,7 @@
                     @include('msg.main')
 
                     <ul>
-                        <form action="{{route('hotels-store')}}" method="post">
+                        <form action="{{route('hotels-store')}}" method="post" enctype="multipart/form-data">
                             <li>Country</li>
                             <select class="form-control" name="create_hotel_country_id" required focus>
                                 <option value="" disabled selected>Please select country</option>
@@ -25,11 +25,12 @@
                             <li>Price</li>
                             <input type="text" class="form-control" name="create_hotel_price" />
                             <li>Image</li>
-                            <input type="text" class="form-control" name="create_hotel_image" />
+                            <input class="form-control" type="file" name="create_hotel_image" />
                             <li>Trip time</li>
                             <input type="number" class="form-control" name="create_hotel_trip_time" />
                             
                             @csrf
+                            @method('post') 
                             <button type="submit" class="button-top-margin btn btn-success btn-sm">Create</button>
                         </form>
                     </ul>

@@ -36,7 +36,7 @@
                             {{-- <td>{{$hotel->image}}</td> --}}
                             <td class="image-box">
                                 @if($hotel->image)
-                                <img  src="{{$hotel->image}}">
+                                <img src="{{$hotel->image}}">
                                 @endif
                             </td>
                             <td>{{$hotel->trip_time}}</td>
@@ -52,6 +52,14 @@
                                 </form>
                             </td>
                             @endif
+                            @if(Auth::user()->role < 9) <td>
+                                <form action="{{route('hotels-order', $hotel->id)}}" method="post">
+                                    @csrf
+                                    @method('put')
+                                    <button type="submit" class="button-top-margin btn btn-success btn-sm">Order</button>
+                                </form>
+                                </td>
+                                @endif
                         </tr>
 
                         @empty

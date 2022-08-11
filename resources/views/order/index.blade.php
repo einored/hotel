@@ -26,7 +26,13 @@
                             <td>{{$order->id}}</td>
                             <td>{{$order->hotel->hotel_name}}</td>
                             <td>{{$order->user->name}}</td>
-                            <td>{{$order->status}}</td>
+                            <td>
+                                @if($order->status == 0)
+                                Nepatvirtinta
+                                @else
+                                Patvirtinta
+                                @endif
+                            </td>                            
                             <td>
                                 <a class="btn btn-success btn-sm" href="{{route('orders-edit', $order)}}">Edit</a>
                             </td>
@@ -58,7 +64,13 @@
                         @if(Auth::user()->id == $order->user_id)
                         <tr>
                             <td>{{$order->hotel->hotel_name}}</td>
-                            <td>{{$order->status}}</td>
+                            <td>
+                                @if($order->status == 0)
+                                Nepatvirtinta
+                                @else
+                                Patvirtinta
+                                @endif
+                            </td> 
                         </tr>
 
 
